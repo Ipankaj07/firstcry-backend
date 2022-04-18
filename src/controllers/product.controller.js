@@ -24,9 +24,10 @@ router.get("/filters", async (req, res) => {
         let discount = req.query.discount ? req.query.discount.split(',') : [];
         let brand = req.query.brand ? req.query.brand.split(',') : [];
         let age = req.query.age ? req.query.age.split(',') : [];
-        let color = req.color ? req.color.split(',') : [];
-        let material = req.material ? req.material.split(',') : [];
-        let subCategory = req.subCategory ? req.subCategory.split(',') : [];
+        let color = req.query.color ? req.query.color.split(',') : [];
+        let material = req.query.material ? req.query.material.split(',') : [];
+        let subCategory = req.query.subCategory ? req.query.subCategory.split(',') : [];
+        let gender = req.query.gender ? req.query.gender : '';
 
         price = price.map(item => {
             return parseInt(item);
@@ -36,6 +37,10 @@ router.get("/filters", async (req, res) => {
 
         if (name) {
             query.name = { $regex: name, $options: 'i' }
+        }
+
+        if(gender){
+            query.gender = { $in : gender }
         }
 
         if (price.length > 0) {
