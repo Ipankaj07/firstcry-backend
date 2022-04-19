@@ -29,9 +29,9 @@ router.get("/filters", async (req, res) => {
         let subCategory = req.query.subCategory ? req.query.subCategory.split(',') : [];
         let gender = req.query.gender ? req.query.gender : '';
 
-        price = price.map(item => {
-            return parseInt(item);
-        });
+        // price = price.map(item => {
+        //     return parseInt(item);
+        // });
 
         const query = {}
 
@@ -39,53 +39,44 @@ router.get("/filters", async (req, res) => {
             query.name = { $regex: name, $options: 'i' }
         }
 
-        if(gender){
-            query.gender = { $in : gender }
+        if (gender) {
+            query.gender = { $in: gender }
         }
 
         if (price.length > 0) {
-            query.price = { $in: [...price] }
+            // query.price = { $in: [...price] }
+            query.price = { $lte: +price }
         }
 
         if (discount.length > 0) {
-            query.discount = { $in: discount }
+            query.discount = { $lte: +discount }
         }
 
         if (brand.length > 0) {
-            query.brand = { $in: brand }
+            query.brand = { $in: [...brand] }
         }
 
         if (age.length > 0) {
-            query.age = {
-                $in: age.map(age => {
-                    return { $gte: age.split('-')[0] * 12, $lte: age.split('-')[1] * 12 }
-                })
-            }
+            age = age.join('-');
+            query.age = { $in: age }
         }
 
         if (color.length > 0) {
-            query.color = { $in: color }
+            query.color = { $in: [...color] }
         }
 
         if (material.length > 0) {
-            query.material = { $in: material }
+            query.material = { $in: [...material] }
         }
 
         if (subCategory.length > 0) {
-            query.subCategory = { $in: subCategory }
+            query.subCategory = { $in: [...subCategory] }
         }
 
         const productData = await Product.find(query);
         return res.status(200).json({
             productData
         });
-
-        // const totalPage = Math.ceil(productData.length / 10);
-
-        // res.status(200).json({
-        //     productData,
-        //     totalPage
-        // });
 
     }
 
