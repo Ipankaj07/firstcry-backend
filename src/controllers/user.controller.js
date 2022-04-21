@@ -1,25 +1,3 @@
-/* 
-
-const userSchema = new monogose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-    cart: [
-        {
-            type: monogose.Schema.Types.ObjectId,
-            ref: 'Product', required: false
-        }
-    ],
-    sortlist: [
-        {
-            type: monogose.Schema.Types.ObjectId,
-            ref: 'Product', required: false
-        }
-    ],
-},
-*/
-
 const express = require('express');
 const router = express.Router();
 
@@ -39,9 +17,36 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/signup', async (req, res) => {
     try {
         const user = await User.create(req.body);
+        return res.status(200).json({
+            user
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(401).json({
+                message: 'Email or password is incorrect'
+            });
+
+        }
+
+        const isPasswordMatch = await user.password === req.body.password;
+        if (!isPasswordMatch) {
+            return res.status(401).json({
+                message: 'Email or password is incorrect'
+            });
+        }
         return res.status(200).json({
             user
         });
@@ -67,14 +72,17 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
-//add to cart
-router.patch('/:id/add-cart', async (req, res) => {
+//add - cart
+router.patch('/cart/add', async (req, res) => {
+    console.log(req.body);
     try {
-        const data = await User.findByIdAndUpdate(req.params.id,
+
+        const data = await User.findByIdAndUpdate(req.body.userId,
             {
                 $push: { cart: [req.body.productId] }
             },
             { new: true });
+
         res.status(200).json({
             data
         });
@@ -86,9 +94,9 @@ router.patch('/:id/add-cart', async (req, res) => {
 });
 
 //remove from cart
-router.patch('/:id/remove-cart', async (req, res) => {
+router.patch('/cart/remove', async (req, res) => {
     try {
-        const data = await User.findByIdAndUpdate(req.params.id,
+        const data = await User.findByIdAndUpdate(req.body.userId,
             {
                 $pull: { cart: req.body.productId }
             },
@@ -102,6 +110,46 @@ router.patch('/:id/remove-cart', async (req, res) => {
         });
     }
 });
+
+//shortlist-----------------
+
+router.patch('/sortlist/add', async (req, res) => {
+    try {
+
+        const data = await User.findByIdAndUpdate(req.body.userId,
+            {
+                $push: { sortlist: [req.body.productId] }
+            },
+            { new: true });
+
+        res.status(200).json({
+            data
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+//remove from sortlist
+router.patch('/sortlist/remove', async (req, res) => {
+    try {
+        const data = await User.findByIdAndUpdate(req.body.userId,
+            {
+                $pull: { sortlist: req.body.productId }
+            },
+            { new: true });
+        res.status(200).json({
+            data
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
 
 
 router.delete('/:id', async (req, res) => {
