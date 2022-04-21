@@ -74,9 +74,9 @@ router.get("/filters", async (req, res) => {
         }
 
         const productData = await Product.find(query);
-        return res.status(200).json({
+        return res.status(200).json(
             productData
-        });
+        );
 
     }
 
