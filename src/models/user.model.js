@@ -11,7 +11,7 @@ const userSchema = new monogose.Schema({
             ref: 'Product', required: false
         }
     ],
-    wishlist: [
+    sortlist: [
         {
             type: monogose.Schema.Types.ObjectId,
             ref: 'Product', required: false
