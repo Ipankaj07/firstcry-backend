@@ -150,7 +150,19 @@ router.patch('/sortlist/remove', async (req, res) => {
     }
 });
 
-
+router.get("/:id", async (req, rse) => {
+    try {
+        const user = await User.findById(req.params.id);
+        rse.status(200).json({
+            user
+        });
+    }
+    catch (err) {
+        rse.status(500).json({
+            message: err.message
+        });
+    }
+})
 
 router.delete('/:id', async (req, res) => {
     try {
